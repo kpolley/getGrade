@@ -9,10 +9,11 @@ parser = SafeConfigParser()
 
 parser.read('/home/pi/Documents/GitHub/grades/config.ini')
 
+pdfLink = "http://csiflabs.cs.ucdavis.edu/~ssdavis/60/60w17.pdf"
 #gets PDF from website and converts to ASCII
 def getPdf():
     testfile = urllib.URLopener()
-    testfile.retrieve("http://csiflabs.cs.ucdavis.edu/~ssdavis/60/60w17.pdf", "60w17.pdf")
+    testfile.retrieve(pdfLink, "60w17.pdf")
     
     output="/home/pi/Documents/GitHub/grades/out.txt"
     os.system(("ps2ascii %s %s") %( '60w17.pdf', output))
@@ -27,23 +28,25 @@ def checkTime():
 
 #finds my ID, prints my grades
 def myGrade():
+    myID = parser.get('myID', 'number')
     f = open('out.txt')
-
-    message = "New Grade! Here's the info: "
-    
+    message = ''
     for line in f:
         char = 0
         found = 0 
         while(char != 5000):
-            if(line[char:char+4] == '3794'): #finds my ID
+            if(line[char:char+4] == myID): #finds my ID
                 found = 1;
                 break
             char=char+1
         
         if(found == 1):
             while(line[char].isalpha() == False): #prints all characters until it hits a letter (my grade)
-                print(line[char], end='')
-                message = message + line[char]
+                if(line[char] == ' '):
+                    message = message + ' | '
+                else:    
+                    print(line[char], end='')
+                    message = message + line[char]
                 char=char+1
                 
             #prints grade    
@@ -54,6 +57,8 @@ def myGrade():
             else:
                 print(line[char])
                 message = message + line[char]
+
+            
     return(message)
 
 
@@ -75,8 +80,7 @@ def fbMessege(message):
                 
 def main():
 
-
-    myID = parser.get('myID', 'number')
+    
     
     cts = checkTime() #gets current download timestamp
 
@@ -85,7 +89,10 @@ def main():
     nts = checkTime() #gets new download timestamp
 
     if(cts == nts):  #if new pdf is updated, print my grade
-       fbMessege(myGrade())
+        message = "New grade! Here's the info:\n"
+
+        message = message + myGrade() + "\nClick here for more details: " + pdfLink
+        fbMessege(message)
 
     
 main()
