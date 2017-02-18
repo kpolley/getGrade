@@ -1,6 +1,13 @@
 from __future__ import print_function
 import os
 import urllib
+import fbchat
+
+from ConfigParser import SafeConfigParser
+
+parser = SafeConfigParser()
+
+parser.read('/home/pi/Documents/GitHub/grades/config.ini')
 
 #gets PDF from website and converts to ASCII
 def getPdf():
@@ -22,6 +29,7 @@ def checkTime():
 def myGrade():
     f = open('out.txt')
 
+    message = "New Grade! Here's the info: "
     
     for line in f:
         char = 0
@@ -35,16 +43,41 @@ def myGrade():
         if(found == 1):
             while(line[char].isalpha() == False): #prints all characters until it hits a letter (my grade)
                 print(line[char], end='')
+                message = message + line[char]
                 char=char+1
                 
             #prints grade    
             if(line[char+1] == '+' or line[char+1] == '-'):
                 print(line[char] + line[char+1])
+                message = message + line[char] + line[char+1]
 
             else:
                 print(line[char])
+                message = message + line[char]
+    return(message)
 
+
+def fbMessege(message):
+    username = parser.get('messenger', 'myUsername')
+    password = parser.get('messenger', 'myPassword')
+    UID = parser.get('messenger', 'myUID')
+
+    client = fbchat.Client(username, password)
+
+    sent = client.send(UID, message)
+
+    if sent:
+        print("Message sent successfully!")
+
+
+
+
+                
 def main():
+
+
+    myID = parser.get('myID', 'number')
+    
     cts = checkTime() #gets current download timestamp
 
     getPdf() #downloads pdf from URL
@@ -52,7 +85,7 @@ def main():
     nts = checkTime() #gets new download timestamp
 
     if(cts == nts):  #if new pdf is updated, print my grade
-        myGrade()
+       fbMessege(myGrade())
 
     
 main()
