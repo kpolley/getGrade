@@ -90,7 +90,7 @@ def main():
 
     nts = checkTime() #gets new download timestamp
 
-    if(cts == nts):  #if new pdf is updated, print my grade
+    if(cts != nts):  #if new pdf is updated, print my grade
         message = "New grade! Here's the info:\n"
 
         message = message + myGrade() + "\nClick here for more details: " + pdfLink
