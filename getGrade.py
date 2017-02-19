@@ -16,15 +16,14 @@ output = "/home/pi/Documents/GitHub/grades/out.txt"
 def getPdf():
     testfile = urllib.URLopener()
     testfile.retrieve(pdfLink, pdfLoc)
-    
-    
+
     os.system(("ps2ascii %s %s") %(pdfLoc, output))
 
 #gets the timestamp of PDF
 def checkTime():
     f = open(output)
     allGrades = f.read()
-    firstLine = allGrades.split('PM', 1)[0]
+    firstLine = allGrades.split('M', 1)[0] #stops at the end of the line, either PM or AM
     print(firstLine)
     return firstLine
 
@@ -59,7 +58,6 @@ def myGrade():
             else:
                 print(line[char])
                 message = message + line[char]
-
             
     return(message)
 
@@ -75,15 +73,9 @@ def fbMessege(message):
 
     if sent:
         print("Message sent successfully!")
-
-
-
-
                 
 def main():
 
-    
-    
     cts = checkTime() #gets current download timestamp
 
     getPdf() #downloads pdf from URL
@@ -91,10 +83,7 @@ def main():
     nts = checkTime() #gets new download timestamp
 
     if(cts != nts):  #if new pdf is updated, print my grade
-        message = "New grade! Here's the info:\n"
-
-        message = message + myGrade() + "\nClick here for more details: " + pdfLink
+        message = "New grade! Here's the info:\n" + myGrade() + "\nClick here for more details: " + pdfLink
         fbMessege(message)
-
     
 main()
