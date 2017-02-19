@@ -10,17 +10,19 @@ parser = SafeConfigParser()
 parser.read('/home/pi/Documents/GitHub/grades/config.ini')
 
 pdfLink = "http://csiflabs.cs.ucdavis.edu/~ssdavis/60/60w17.pdf"
+pdfLoc = "/home/pi/Documents/GitHub/grades/60w17.pdf"
+output = "/home/pi/Documents/GitHub/grades/out.txt"
 #gets PDF from website and converts to ASCII
 def getPdf():
     testfile = urllib.URLopener()
-    testfile.retrieve(pdfLink, "60w17.pdf")
+    testfile.retrieve(pdfLink, pdfLoc)
     
-    output="/home/pi/Documents/GitHub/grades/out.txt"
-    os.system(("ps2ascii %s %s") %( '60w17.pdf', output))
+    
+    os.system(("ps2ascii %s %s") %(pdfLoc, output))
 
 #gets the timestamp of PDF
 def checkTime():
-    f = open('out.txt')
+    f = open(output)
     allGrades = f.read()
     firstLine = allGrades.split('PM', 1)[0]
     print(firstLine)
@@ -29,7 +31,7 @@ def checkTime():
 #finds my ID, prints my grades
 def myGrade():
     myID = parser.get('myID', 'number')
-    f = open('out.txt')
+    f = open(output)
     message = ''
     for line in f:
         char = 0
